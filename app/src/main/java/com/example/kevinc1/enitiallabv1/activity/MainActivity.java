@@ -4,12 +4,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+//import android.support.v7.widget.SearchView;
 import android.widget.SearchView;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.example.kevinc1.enitiallabv1.R;
+import com.example.kevinc1.enitiallabv1.adapter.CustomerAdapter;
 import com.example.kevinc1.enitiallabv1.adapter.ShipmentAdapter;
+import com.example.kevinc1.enitiallabv1.model.Customer;
 import com.example.kevinc1.enitiallabv1.model.Shipment;
 import com.example.kevinc1.enitiallabv1.model.ShipmentList;
 import com.example.kevinc1.enitiallabv1.rest.RestClient;
@@ -29,7 +32,9 @@ public class MainActivity extends AppCompatActivity {
     ShipmentAPIService apiService;
     SearchView searchView;
     RecyclerView recyclerView;
-    ShipmentAdapter adapter;
+    //ShipmentAdapter adapter;
+    CustomerAdapter adapter;
+    List<Customer> customers = new ArrayList<>();
     List<Shipment> shipments = new ArrayList<>();
 
     @Override
@@ -45,24 +50,24 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = (RecyclerView) findViewById(R.id.ShipmentListRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        adapter = new ShipmentAdapter(shipments, R.layout.shipment_item, getApplicationContext());
+        adapter = new CustomerAdapter(customers, R.layout.customer_item, getApplicationContext());
         recyclerView.setAdapter(adapter);
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
             @Override
             public boolean onQueryTextSubmit(String query) {
-                Toast.makeText(getBaseContext(), query, Toast.LENGTH_LONG).show();
-                shipments.clear();
-                fetchShipmentList(query);
+                //Toast.makeText(getBaseContext(), query, Toast.LENGTH_LONG).show();
+                customers.clear();
+                fetchCustomers();
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                Toast.makeText(getBaseContext(), newText, Toast.LENGTH_LONG).show();
-                shipments.clear();
-                fetchShipmentList(newText);
+                //Toast.makeText(getBaseContext(), newText, Toast.LENGTH_LONG).show();
+                customers.clear();
+                //fetchShipmentList(newText);
                 return false;
             }
         });
@@ -78,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
         call.enqueue(new Callback<List<Shipment>>() {
             @Override
             public void onResponse(Call<List<Shipment>> call, Response<List<Shipment>> response) {
-                Log.d(TAG, "Total number of questions fetched : " + response.body().size());
+                Log.d(TAG, "Total number of shipments fetched : " + response.body().size());
 
                 shipments.addAll(response.body());
                 adapter.notifyDataSetChanged();
@@ -88,6 +93,26 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<List<Shipment>> call, Throwable t) {
+                Log.e(TAG, "Got error : " + t.getLocalizedMessage());
+            }
+        });
+    }
+
+    private void fetchCustomers() {
+        Call<List<Customer>> call = apiService.fetchCustomers();
+        call.enqueue(new Callback<List<Customer>>() {
+            @Override
+            public void onResponse(Call<List<Customer>> call, Response<List<Customer>> response) {
+                Log.d(TAG, "Total number of customers fetched : " + response.body().size());
+
+                customers.addAll(response.body());
+                adapter.notifyDataSetChanged();
+
+
+            }
+
+            @Override
+            public void onFailure(Call<List<Customer>> call, Throwable t) {
                 Log.e(TAG, "Got error : " + t.getLocalizedMessage());
             }
         });
