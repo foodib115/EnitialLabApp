@@ -5,6 +5,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RestClient {
 
+
     public static final String BASE_URL = "http://vps35978.inmotionhosting.com";
     private static Retrofit retrofit = null;
 

@@ -4,8 +4,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-//import android.support.v7.widget.SearchView;
-import android.widget.SearchView;
+import android.support.v7.widget.SearchView;
+import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuItem;
+//import android.widget.SearchView;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -42,8 +45,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        searchView=(SearchView) findViewById(R.id.searchView);
-        searchView.setQueryHint("Search View");
+        //searchView=(SearchView) findViewById(R.id.action_search);
+        //searchView.setQueryHint("Search View");
 
         apiService = RestClient.getClient().create(ShipmentAPIService.class);
 
@@ -52,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
 
         adapter = new CustomerAdapter(customers, R.layout.customer_item, getApplicationContext());
         recyclerView.setAdapter(adapter);
-
+        /****
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
             @Override
@@ -71,11 +74,30 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
+        ******/
+    }
 
+    @Override
+    public boolean onCreateOptionsMenu( Menu menu) {
+        getMenuInflater().inflate( R.menu.options_menu, menu);
 
+        MenuItem myActionMenuItem = menu.findItem( R.id.action_search);
+        final SearchView searchView = (SearchView) myActionMenuItem.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                customers.clear();
+                fetchCustomers();
+                return false;
+            }
 
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return true;
+            }
+        });
 
-
+        return true;
     }
 
     private void fetchShipmentList(String query) {
